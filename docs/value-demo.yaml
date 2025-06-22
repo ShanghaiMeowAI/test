@@ -1,0 +1,167 @@
+# odoo-instance Chart 的默认值。
+# 这是一个 YAML 格式的文件。
+# 在这里声明可以传递到模板中的变量。
+
+# 重写完整的 release 名称。如果未设置，则为 <Release.Name>-<Chart.Name> 或 <Release.Name>
+# 我们通常会在客户特定的 values 文件中设置此项。
+releaseNameOverride: ""
+
+customer:
+  id: "defaultcustomer" # 默认客户ID，应该在客户特定 values 中被覆盖
+
+image:
+  repository: "docker.public.mmiao.net/meowcloud/odoo-runtime-base" # 基础 Odoo 运行环境镜像的仓库地址
+  tag: "18.0-py3.12" # 镜像的默认标签 (例如 Odoo 版本和 Python 版本)
+  pullPolicy: IfNotPresent # 镜像拉取策略
+
+git:
+  ssh:
+    secretName:
+      "global-git-ssh-key" # 包含 SSH 私钥和 known_hosts 的 Kubernetes Secret 名称
+      # 假设它与 Odoo 实例在同一个命名空间中
+  odooCore:
+    repository: "git@github.com:ShanghaiMeowAI/MeowCloud.git" # Odoo 核心代码的 Git 仓库 (SSH URL)
+    ref: "18.0" # Odoo 核心代码的默认分支/标签 (例如，你锁定的 Odoo 18 稳定分支)
+  customerAddons:
+    [] # 客户专属 addons 列表，默认为空
+    # 客户 addons 结构示例:
+    # - name: "customer-main-modules"  # 用于 clone 到的目录名，并在 addons_path 中引用
+    #   repository: "git@github.com:CustomerOrg/CustomerAddons.git"
+    #   ref: "production"
+    # - name: "specific-feature-module"
+    #   repository: "git@github.com:AnotherOrg/SpecificModule.git"
+    #   ref: "v1.2.3"
+
+# 存储相关配置
+storage:
+  # 创建自定义的 StorageClass (可选)
+  storageClass:
+    create: true # 默认创建，集群级别资源，所有客户共用
+    name: "longhorn-expandable" # StorageClass 的名称
+    provisioner: "driver.longhorn.io" # Longhorn 的 provisioner
+    reclaimPolicy: "Retain" # 回收策略：Retain（保留）或 Delete（删除）
+    allowVolumeExpansion: true # 是否允许卷扩容 - Longhorn 支持
+    parameters:
+      numberOfReplicas: "1" # Longhorn 副本数，单节点环境使用1
+      staleReplicaTimeout: "2880" # 过期副本超时时间（分钟）
+      dataLocality: "disabled" # 数据本地性：disabled, best-effort, strict-local
+      # fromBackup: "" # 从备份恢复（可选）
+      # recurringJobSelector: "" # 定期任务选择器（可选）
+
+  # 存储监控和扩容配置
+  expansion:
+    enabled: true # 是否启用存储扩容功能
+    monitoring:
+      enabled: true # 是否启用存储监控
+      # 监控配置
+      thresholds:
+        warning: 80 # 存储使用率警告阈值（百分比）
+        critical: 90 # 存储使用率严重阈值（百分比）
+      checkInterval: "5m" # 检查间隔
+    # 自动扩容配置（当enabled且monitoring.enabled都为true时生效）
+    auto:
+      enabled: true # 是否启用自动扩容
+      expandThreshold: 85 # 触发自动扩容的阈值（百分比）
+      expandSize: "5Gi" # 每次扩容的固定大小
+      maxSize: "50Gi" # 自动扩容的最大尺寸
+      cooldownPeriod: "30m" # 扩容冷却期，避免频繁扩容
+
+odoo:
+  service:
+    port: 8069 # Odoo 容器内部监听的端口
+    type: ClusterIP # Odoo Service 的类型
+  config:
+    admin_passwd:
+      "123456" # Odoo 超级管理员的初始密码。
+      # 警告：这是默认弱密码，仅用于快速启动和测试！
+      # 强烈建议在首次启动后立即修改，或通过更安全的方式管理。
+    workers:
+      0 # 默认 Odoo worker 数量。0 表示 Odoo 以 cron/开发模式运行。
+      # 生产环境建议设置为 2 * CPU核心数 + 1。
+    limit_request: 8192 # Odoo 请求限制参数 (通常默认即可)
+    limit_memory_hard: "2684354560" # Odoo 进程硬内存限制 (字节)，例如 2.5GB
+    limit_memory_soft: "2147483648" # Odoo 进程软内存限制 (字节)，例如 2GB
+    log_level: "info" # Odoo 日志级别
+    # logfile: "/opt/odoo/logs/odoo-server.log" # Odoo 日志文件路径，默认为 stdout/stderr，适合容器化
+    log_db: "False" # 是否将日志记录到数据库
+    # proxy_mode: True # 将在 ConfigMap 模板中根据 ingress.enabled 或显式设置来决定是否设为 True
+    extraParams:
+      {} # 用于在 odoo.conf 中添加任何其他自定义参数
+      # 示例:
+      # list_db: "False"  # 是否在登录页面显示数据库列表
+      # unaccent: "True"  # 是否启用 unaccent 扩展 (如果 PostgreSQL 安装了)
+      # dbfilter: "%d" # 如果使用子域名区分数据库并且希望自动选择，例如 huabao.erp.mmiao.net -> 数据库 huabao
+  persistence:
+    filestore:
+      enabled: true # 是否为 filestore 创建持久卷声明 (PVC)
+      mountPath: "/opt/odoo/filestore" # Odoo 容器内 filestore 的挂载点
+      size: "10Gi" # filestore PVC 的默认大小
+      storageClass: "longhorn-expandable" # 使用支持扩容的 Longhorn StorageClass
+
+postgresql: # Zalando PostgreSQL Operator 创建数据库实例的配置
+  enabled: true # 是否为此 Odoo 实例创建一个由 Operator 管理的 PostgreSQL 数据库
+  # nameSuffix: "-pg" # PostgreSQL CRD 的名称将是 {{ include "odoo-instance.fullname" . }}-pg
+  version: "16" # PostgreSQL 版本 (请确保你安装的 Zalando Operator 支持此版本)
+  numberOfInstances: 1 # PostgreSQL 实例数量 (1 表示单主节点)
+  user:
+    nameBase:
+      "odoo" # 默认的数据库用户名的基础部分 (不包含客户特定前缀)
+      # 实际用户名将在 _helpers.tpl 中结合客户 ID 生成，例如 "odoo_huabao"
+  databaseName:
+    nameBase:
+      "odoo" # 默认的数据库名称的基础部分 (不包含客户特定前缀)
+      # 实际数据库名将在 _helpers.tpl 中结合客户 ID 生成，例如 "db_huabao"
+  # password: "123456" # 数据库密码。Zalando Operator 会自动生成一个强密码并存储在 Secret 中。
+  # Odoo Deployment 会从那个 Secret 读取密码。不建议在这里硬编码。
+  persistence:
+    size: "5Gi" # PostgreSQL PVC 的默认大小
+    storageClass: "longhorn-expandable" # 使用支持扩容的 Longhorn StorageClass
+  resources: # PostgreSQL Pod 的默认资源请求和限制
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  # external: # 如果要连接到外部管理的 PostgreSQL 数据库，请配置以下部分
+  #   enabled: false
+  #   host: "your-external-pg-host"
+  #   port: 5432
+  #   user: "external_user"
+  #   passwordSecret: # 包含外部数据库密码的 Kubernetes Secret 名称
+  #     name: "external-pg-password-secret"
+  #     key: "password" # Secret 中密码对应的键
+  #   databaseName: "external_db_name"
+
+ingress:
+  enabled: false # 默认是否为 Odoo 创建 Ingress 资源
+  className: "nginx" # 使用的 Ingress Controller 的 IngressClass 名称
+  host: "odoo-default.example.com" # 占位符域名，应在客户 values 中覆盖
+  path: "/" # Ingress 规则的路径
+  pathType: Prefix # Ingress 规则的路径类型
+  annotations:
+    {} # 为 Ingress 资源添加额外的 annotations
+    # Nginx Ingress Controller 常用注解示例:
+    # nginx.ingress.kubernetes.io/proxy-body-size: "100m" # 允许更大的请求体 (Odoo 上传文件可能需要)
+    # nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    # nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "false" # 如果你只用 HTTP，或者 HTTPS 在外部处理
+  tls:
+    enabled: false # 是否为 Ingress 启用 TLS
+    # secretName: "" # 如果启用 TLS，这里指定包含 TLS 证书和私钥的 Secret 名称。
+    # 如果为空且 tls.enabled=true，可以考虑与 cert-manager 集成自动生成，
+    # 或手动创建一个名为 {{ include "odoo-instance.fullname" . }}-tls 的 Secret。
+
+# Odoo Pod 的资源请求和限制
+resources:
+  requests:
+    cpu: "200m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m" # 1 CPU核心
+    memory: "2Gi"
+# Odoo Pod 使用的 ServiceAccount 配置 (可选)
+serviceAccount:
+  create: false # 是否为 Odoo Pod 创建一个 ServiceAccount
+  name: "" # 如果为空，将使用 Chart 的 fullname 生成一个名称。可以按需添加 annotations。
+  annotations: {}

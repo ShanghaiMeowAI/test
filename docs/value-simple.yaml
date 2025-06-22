@@ -1,0 +1,19 @@
+releaseNameOverride: "deezee-webportal"
+
+customer:
+  id: "deezee"
+
+git:
+  customerAddons:
+    - name: "deezee-webportal"
+      repository: "git@github.com:ShanghaiMeowAI/deezee-webportal.git"
+      ref: "main"
+
+odoo:
+  initDatabase: false
+  config:
+    admin_passwd: "123456"
+
+ingress:
+  enabled: true
+  host: "webportal.erp.mmiao.net"
