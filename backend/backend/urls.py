@@ -12,9 +12,11 @@ from django.contrib.auth import authenticate
 from rest_framework import status
 
 # 导入视图集
-from customers.views import CustomerViewSet, LicenseKeyViewSet
+from customers.views import CustomerViewSet
 from environments.views import EnvironmentViewSet, EnvironmentLogViewSet
 from users.views import UserViewSet, UserActivityLogViewSet
+from licenses.views import LicenseViewSet, LicenseUsageViewSet, LicenseLogViewSet
+from system.views import get_settings, update_settings, get_system_info, backup_database, clean_logs
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -87,11 +89,13 @@ def logout_view(request):
 # 配置DRF路由
 router = DefaultRouter()
 router.register(r'customers', CustomerViewSet)
-router.register(r'license-keys', LicenseKeyViewSet)
 router.register(r'environments', EnvironmentViewSet)
 router.register(r'environment-logs', EnvironmentLogViewSet)
 router.register(r'users', UserViewSet)
-router.register(r'activity-logs', UserActivityLogViewSet)
+router.register(r'user-activity-logs', UserActivityLogViewSet)
+router.register(r'licenses', LicenseViewSet)
+router.register(r'license-usage', LicenseUsageViewSet)
+router.register(r'license-logs', LicenseLogViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -99,5 +103,10 @@ urlpatterns = [
     path('api/health/', health_check, name='health_check'),
     path('api/login/', login_view, name='login'),
     path('api/logout/', logout_view, name='logout'),
+    path('api/system/settings/', get_settings, name='get_settings'),
+    path('api/system/settings/update/', update_settings, name='update_settings'),
+    path('api/system/info/', get_system_info, name='system_info'),
+    path('api/system/backup/', backup_database, name='backup_database'),
+    path('api/system/clean-logs/', clean_logs, name='clean_logs'),
     path('api-auth/', include('rest_framework.urls')),  # DRF登录界面
 ]

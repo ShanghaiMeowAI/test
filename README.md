@@ -1,278 +1,269 @@
-# Odoo SaaS 运营管理平台
+# Odoo SaaS 管理系统
 
-这是一个基于 Django + React 的现代化 SaaS 运营管理系统，专为管理 Odoo 部署环境设计。
+一个基于 Django + React 的 Odoo SaaS 平台管理系统，支持多租户环境管理、客户管理、授权码管理等功能。
 
-## 🚀 项目特点
+## 功能特性
 
-- **现代化UI设计**：基于 Tailwind CSS 的响应式设计
-- **完整的CRUD功能**：客户管理、环境管理等
-- **实时状态管理**：环境启停、健康检查
-- **权限管理系统**：多级用户权限控制
-- **API优先设计**：RESTful API 架构
-- **类型安全**：TypeScript 全面支持
+### ✅ 已完成功能
 
-## ��️ 技术栈
+- **🔐 用户认证系统**
+
+  - 用户登录/登出
+  - 基于角色的权限控制（管理员、运维员、查看员）
+  - JWT Token 认证
+
+- **📊 仪表盘**
+
+  - 系统统计数据展示
+  - 客户和环境状态概览
+  - 系统健康状态监控
+
+- **👥 客户管理**
+
+  - 客户信息 CRUD 操作
+  - 客户状态管理（活跃、暂停、过期、试用）
+  - 部署类型管理（在线、离线）
+  - 合同信息管理
+
+- **🖥️ 环境管理**
+
+  - Odoo 环境的创建、编辑、删除
+  - 环境启动/停止操作
+  - 健康检查功能
+  - 环境状态监控
+  - 资源配置管理
+
+- **� 授权码管理**
+
+  - 离线授权码生成
+  - 授权码状态管理
+  - 使用次数控制
+  - 有效期管理
+
+- **👤 用户管理**
+
+  - 用户账号 CRUD 操作
+  - 用户权限配置
+  - 角色分配
+  - 用户资料管理
+
+- **📋 操作日志**
+
+  - 环境操作日志记录
+  - 用户活动日志
+  - 系统审计功能
+
+- **⚙️ 系统设置**
+  - 系统基本参数配置
+  - Kubernetes 集群配置
+  - 功能开关管理
+  - 系统状态监控
+
+## 技术栈
 
 ### 后端
-- **Django 5.0.7** - Web框架
-- **Django REST Framework** - API框架
-- **SQLite** - 数据库（开发环境）
-- **Python 3.x** - 编程语言
+
+- **Django 4.2** - Web 框架
+- **Django REST Framework** - API 框架
+- **PostgreSQL** - 数据库
+- **Redis** - 缓存和会话存储
 
 ### 前端
+
 - **React 18** - 前端框架
 - **TypeScript** - 类型安全
 - **Tailwind CSS** - 样式框架
 - **React Router** - 路由管理
-- **Heroicons** - 图标库
-- **Axios** - HTTP客户端
+- **Axios** - HTTP 客户端
 
-## 📦 快速开始
+## 项目结构
+
+```
+.
+├── backend/                 # Django后端
+│   ├── backend/            # Django项目配置
+│   ├── customers/          # 客户管理应用
+│   ├── environments/       # 环境管理应用
+│   ├── users/             # 用户管理应用
+│   ├── manage.py          # Django管理脚本
+│   └── requirements.txt   # Python依赖
+├── frontend/              # React前端
+│   ├── src/
+│   │   ├── components/    # React组件
+│   │   ├── pages/        # 页面组件
+│   │   ├── services/     # API服务
+│   │   ├── types/        # TypeScript类型
+│   │   └── contexts/     # React上下文
+│   ├── package.json      # Node.js依赖
+│   └── tailwind.config.js # Tailwind配置
+├── docs/                  # 文档
+└── README.md             # 项目说明
+```
+
+## 快速开始
+
+### 前置要求
+
+- Python 3.8+
+- Node.js 16+
+- PostgreSQL 12+
+- Redis (可选)
 
 ### 1. 克隆项目
+
 ```bash
 git clone <repository-url>
 cd odoo-saas-management
 ```
 
-### 2. 一键启动
+### 2. 后端设置
+
 ```bash
-./start.sh
+# 进入后端目录
+cd backend
+
+# 创建虚拟环境
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 安装依赖
+pip install -r requirements.txt
+
+# 配置数据库
+# 编辑 backend/settings.py 中的数据库配置
+
+# 运行数据库迁移
+python manage.py migrate
+
+# 创建管理员用户
+python manage.py shell < create_admin_user.py
+
+# 启动后端服务
+python manage.py runserver
 ```
 
-### 3. 访问应用
-- 前端: http://localhost:3000
-- 后端API: http://127.0.0.1:8000/api/
-- Django管理后台: http://127.0.0.1:8000/admin/
+### 3. 前端设置
 
-### 4. 默认账户
-- 管理员: `admin` / `admin123`
-- 运维员: `operator` / `operator123`
+```bash
+# 打开新终端，进入前端目录
+cd frontend
 
-## 🎯 核心功能
+# 安装依赖
+npm install
 
-### ✅ 已完成功能
+# 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，设置API地址
 
-#### 1. 仪表盘
-- 📊 **实时统计**：客户数量、环境状态、部署类型分布
-- 📈 **可视化图表**：状态分布、趋势分析
-- 🔗 **快速导航**：一键跳转到具体管理页面
+# 启动前端服务
+npm start
+```
 
-#### 2. 客户管理
-- 👥 **客户信息管理**：基本信息、联系方式、合同状态
-- 🏷️ **状态标识**：活跃、试用、暂停、过期
-- 🌐 **部署类型**：在线部署、离线部署
-- 🔍 **智能搜索**：支持名称、ID、邮箱搜索
-- 📊 **筛选功能**：按状态、部署类型筛选
+### 4. 访问系统
 
-#### 3. 环境管理
-- 🖥️ **环境信息**：Release名称、命名空间、版本
-- 🌐 **访问管理**：域名配置、HTTPS支持
-- ⚡ **状态控制**：启动、停止、健康检查
-- 📊 **资源监控**：CPU、内存、存储配置
-- 🔍 **搜索筛选**：环境名称、客户、状态
+- 前端地址: http://localhost:3000
+- 后端 API: http://localhost:8000/api
+- Django 管理后台: http://localhost:8000/admin
 
-#### 4. 用户权限系统
-- 👤 **用户资料**：基本信息、角色权限
-- 🔐 **角色控制**：管理员、运维员、查看员
-- 📝 **操作日志**：用户行为记录
-- 🛡️ **权限管理**：细粒度权限控制
+默认管理员账号:
 
-#### 5. 授权码管理
-- 🔑 **离线授权**：基于时间算法的授权码
-- ⏰ **有效期管理**：过期时间控制
-- 📊 **使用统计**：使用次数跟踪
+- 用户名: `admin`
+- 密码: `admin123`
 
-### 🔧 技术实现
+## 部署指南
 
-#### Django后端架构
-- **模型设计**：Customer、Environment、LicenseKey、UserProfile
-- **API设计**：RESTful风格，支持筛选、搜索、分页
-- **权限控制**：基于角色的访问控制
-- **数据验证**：模型级别和序列化器级别验证
-- **操作日志**：完整的审计跟踪
+### 生产环境部署
 
-#### React前端架构
-- **组件化设计**：可复用的UI组件库
-- **类型安全**：TypeScript接口定义
-- **状态管理**：React Hooks + 本地状态
-- **响应式设计**：移动设备友好
-- **错误处理**：优雅的错误提示
+1. **数据库配置**
 
-### 🎨 UI/UX 特色
+   - 使用 PostgreSQL 作为生产数据库
+   - 配置 Redis 用于缓存和会话
 
-#### 设计理念
-- **简洁现代**：清晰的视觉层次
-- **响应式**：适配各种设备
-- **用户友好**：直观的操作流程
-- **高效操作**：快速访问常用功能
+2. **后端部署**
 
-#### 组件库
-- **Card组件**：统一的卡片样式
-- **Button组件**：多种样式和状态
-- **Badge组件**：状态标识
-- **Table组件**：数据展示
-- **Loading组件**：加载状态
+   - 使用 Gunicorn + Nginx
+   - 配置静态文件服务
+   - 设置环境变量
 
-## 📚 API文档
+3. **前端部署**
+   - 运行 `npm run build` 构建生产版本
+   - 使用 Nginx 提供静态文件服务
 
-### 核心API端点
+## API 文档
 
-#### 客户管理
+主要 API 端点：
+
+- `POST /api/login/` - 用户登录
+- `POST /api/logout/` - 用户登出
 - `GET /api/customers/` - 获取客户列表
-- `POST /api/customers/` - 创建客户
-- `GET /api/customers/{id}/` - 获取客户详情
-- `PUT /api/customers/{id}/` - 更新客户
-- `DELETE /api/customers/{id}/` - 删除客户
-- `POST /api/customers/{id}/generate_license/` - 生成授权码
-- `GET /api/customers/stats/` - 获取统计信息
-
-#### 环境管理
 - `GET /api/environments/` - 获取环境列表
-- `POST /api/environments/` - 创建环境
 - `POST /api/environments/{id}/start/` - 启动环境
 - `POST /api/environments/{id}/stop/` - 停止环境
-- `POST /api/environments/{id}/health_check/` - 健康检查
-- `GET /api/environments/stats/` - 获取统计信息
-
-#### 用户管理
-- `GET /api/users/me/` - 获取当前用户信息
+- `GET /api/license-keys/` - 获取授权码列表
 - `GET /api/users/` - 获取用户列表
-- `POST /api/users/{id}/update_profile/` - 更新용户资料
+- `GET /api/environment-logs/` - 获取环境日志
 
-## 🗂️ 项目结构
+## 权限说明
 
-```
-odoo-saas-management/
-├── backend/                    # Django后端
-│   ├── backend/               # 项目配置
-│   ├── customers/             # 客户管理应用
-│   ├── environments/          # 环境管理应用
-│   ├── users/                # 用户管理应用
-│   └── manage.py             # Django管理脚本
-├── frontend/                  # React前端
-│   ├── src/
-│   │   ├── components/       # 组件库
-│   │   │   ├── ui/          # UI组件
-│   │   │   └── layout/      # 布局组件
-│   │   ├── pages/           # 页面组件
-│   │   ├── services/        # API服务
-│   │   └── types/           # TypeScript类型
-│   └── public/              # 静态资源
-├── docs/                     # 文档
-├── start.sh                  # 启动脚本
-├── check_status.sh           # 状态检查脚本
-└── README.md                 # 项目说明
-```
+### 角色权限
 
-## 🎯 下一步计划
+- **管理员 (admin)**: 拥有所有权限
+- **运维员 (operator)**: 可管理客户和环境，查看日志
+- **查看员 (viewer)**: 只能查看数据，不能修改
 
-### 即将实现的功能
-- [ ] 客户表单（新增/编辑）
-- [ ] 环境部署向导
-- [ ] 授权码生成界面
-- [ ] 用户管理界面
-- [ ] 操作日志查看
-- [ ] 系统设置
-- [ ] Kubernetes集成
-- [ ] 实时通知系统
-- [ ] 数据导出功能
-- [ ] 批量操作
+### 功能权限
 
-### 技术优化
-- [ ] 数据缓存优化
-- [ ] 性能监控
-- [ ] 自动化测试
-- [ ] CI/CD集成
-- [ ] 容器化部署
-- [ ] 多语言支持
+- `can_manage_customers`: 客户管理权限
+- `can_manage_environments`: 环境管理权限
+- `can_view_logs`: 日志查看权限
+- `can_generate_licenses`: 授权码生成权限
 
-## 🤝 贡献指南
+## 开发指南
+
+### 后端开发
+
+- 遵循 Django 最佳实践
+- 使用 Django REST Framework 构建 API
+- 模型定义在各应用的 `models.py` 中
+- API 视图在 `views.py` 中
+- 序列化器在 `serializers.py` 中
+
+### 前端开发
+
+- 使用 TypeScript 确保类型安全
+- 组件采用函数式组件 + Hooks
+- 使用 Tailwind CSS 进行样式开发
+- API 调用统一在 `services/api.ts` 中管理
+
+## 故障排除
+
+### 常见问题
+
+1. **数据库连接错误**
+
+   - 检查 PostgreSQL 服务是否启动
+   - 验证数据库配置信息
+
+2. **前端无法连接后端**
+
+   - 检查后端服务是否启动
+   - 验证 `.env` 文件中的 API 地址
+
+3. **权限错误**
+   - 确保用户有相应的权限
+   - 检查用户角色配置
+
+## 贡献指南
 
 1. Fork 项目
 2. 创建功能分支
 3. 提交更改
-4. 推送到分支
-5. 创建 Pull Request
+4. 创建 Pull Request
 
-## 📄 许可证
+## 许可证
 
-MIT License
+本项目采用 MIT 许可证。详见 LICENSE 文件。
 
-## 📞 联系我们
+## 联系方式
 
-- 项目地址: [GitHub Repository]
-- 问题反馈: [Issues Page]
-- 技术文档: [Documentation]
-
----
-
-🎉 **感谢使用 Odoo SaaS 运营管理平台！**
-
-## 🔐 完整的登录认证系统
-
-### ✅ 已实现的认证功能
-
-#### 1. 用户认证
-- **Token认证**：基于DRF Token Authentication
-- **会话管理**：安全的用户会话控制
-- **权限控制**：基于角色的细粒度权限管理
-
-#### 2. 登录界面
-- **现代化设计**：精美的登录页面UI
-- **用户体验**：
-  - 密码显示/隐藏切换
-  - 实时表单验证
-  - 友好的错误提示
-  - 加载状态显示
-- **测试账户提示**：直接显示可用的测试账户
-
-#### 3. 路由保护
-- **ProtectedRoute组件**：自动保护需要认证的路由
-- **登录重定向**：未认证用户自动跳转到登录页
-- **状态保持**：登录后可回到原访问页面
-
-#### 4. 用户信息展示
-- **Header用户菜单**：下拉菜单显示用户信息和登出
-- **Sidebar用户信息**：侧边栏底部显示当前用户
-- **动态用户头像**：根据用户名生成首字母头像
-- **权限显示**：根据用户角色显示相应权限
-
-### 🎯 认证流程
-
-1. **访问保护页面** → 自动跳转到登录页
-2. **输入用户名密码** → 验证凭据
-3. **登录成功** → 获取Token并保存到localStorage
-4. **自动跳转** → 跳转到原目标页面或首页
-5. **API调用** → 自动在请求头中添加Token
-6. **会话保持** → 刷新页面后自动恢复登录状态
-
-### 🔑 测试账户
-
-#### 管理员账户
-- **用户名**: `admin`
-- **密码**: `admin123`
-- **权限**: 全部权限（客户管理、环境管理、授权码生成等）
-
-#### 运维员账户
-- **用户名**: `operator` 
-- **密码**: `operator123`
-- **权限**: 客户管理、环境管理、日志查看（无授权码生成权限）
-
-### 📱 使用方法
-
-1. **打开应用**: 访问 http://localhost:3000
-2. **自动跳转**: 未登录状态下自动跳转到登录页
-3. **选择账户**: 使用上述测试账户登录
-4. **开始使用**: 登录成功后进入仪表盘
-
-### 🛡️ 安全特性
-
-- **Token过期处理**：Token无效时自动清除并跳转登录
-- **请求拦截**：自动为所有API请求添加认证头
-- **本地存储**：安全存储用户Token和状态
-- **错误处理**：优雅处理认证失败和网络错误
-
----
-
-🎉 **现在系统具有完整的用户认证功能，请使用测试账户登录体验！**
+如有问题或建议，请联系开发团队。

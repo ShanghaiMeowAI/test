@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Odoo SaaS Management Platform",
   "scripts": {
+    "init": "npm run install && npm run migrate && npm run seed",
+    "seed": "source backend_env/bin/activate && cd backend && python create_test_data.py && python create_admin_user.py",
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "cd frontend && npm start",
     "dev:backend": "source backend_env/bin/activate && cd backend && python manage.py runserver",

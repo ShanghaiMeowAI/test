@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'customers',
     'environments',
     'users',
+    'licenses',
+    'system',
 ]
 
 MIDDLEWARE = [
